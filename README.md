@@ -143,11 +143,3 @@ correctly failed. All well under the 5-second target.
   standalone prototype.
 - **No persistence / auth.** A production deployment needs PII handling, retention
   policy, and access control (out of scope here per Marcus).
-
-## Next steps for production
-
-Font-size/format analysis via OCR bounding boxes; confidence scores surfaced to the
-agent for borderline reads; a "needs better photo" path for low-confidence images;
-COLA integration behind its own authorization; and threshold calibration on real
-labels.
-```
