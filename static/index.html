@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TTB Label Verification</title>
+<style>
+  :root {
+    --ink:#1a2233; --muted:#5b6577; --line:#d4dae6; --bg:#f4f6fb;
+    --brand:#1f3a8a; --brand-d:#16296b;
+    --pass-bg:#e7f6ec; --pass:#10733b; --pass-line:#9bd6b1;
+    --fail-bg:#fdecec; --fail:#b3261e; --fail-line:#f0b4b0;
+    --focus:#2f6fed;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    font-size:18px; line-height:1.5; }
+  header { background:var(--brand); color:#fff; padding:22px 28px; }
+  header h1 { margin:0; font-size:26px; letter-spacing:.2px; }
+  header p { margin:4px 0 0; opacity:.9; font-size:16px; }
+  main { max-width:920px; margin:0 auto; padding:24px 20px 64px; }
+  .tabs { display:flex; gap:8px; margin:8px 0 20px; }
+  .tab { flex:1; padding:16px; font-size:19px; font-weight:600; cursor:pointer;
+    background:#fff; border:2px solid var(--line); border-radius:12px; text-align:center; color:var(--muted); }
+  .tab[aria-selected="true"] { border-color:var(--brand); color:var(--brand); background:#eef2ff; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:18px; }
+  label.fld { display:block; font-weight:600; margin:14px 0 6px; }
+  input[type=text] { width:100%; padding:13px 14px; font-size:18px; border:2px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--ink); }
+  input[type=text]:focus, .drop:focus, button:focus { outline:3px solid var(--focus); outline-offset:2px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
+  @media (max-width:620px){ .grid{ grid-template-columns:1fr; } }
+  .drop { border:3px dashed var(--line); border-radius:14px; padding:26px; text-align:center;
+    color:var(--muted); cursor:pointer; background:#fafbff; }
+  .drop strong { color:var(--ink); }
+  .preview { margin-top:14px; max-height:240px; border-radius:10px; border:1px solid var(--line); display:none; }
+  .btn { margin-top:20px; width:100%; padding:18px; font-size:20px; font-weight:700; color:#fff;
+    background:var(--brand); border:none; border-radius:12px; cursor:pointer; }
+  .btn:hover { background:var(--brand-d); }
+  .btn[disabled] { opacity:.6; cursor:progress; }
+  .hint { color:var(--muted); font-size:15px; margin-top:6px; }
+
+  .banner { display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:12px;
+    font-size:22px; font-weight:800; border:2px solid; }
+  .banner.pass { background:var(--pass-bg); color:var(--pass); border-color:var(--pass-line); }
+  .banner.fail { background:var(--fail-bg); color:var(--fail); border-color:var(--fail-line); }
+  .mark { font-size:26px; }
+  .time { margin-left:auto; font-size:15px; font-weight:600; color:var(--muted); }
+
+  table { width:100%; border-collapse:collapse; margin-top:14px; font-size:17px; }
+  th,td { text-align:left; padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-size:14px; text-transform:uppercase; letter-spacing:.4px; }
+  .pill { font-weight:800; }
+  .pill.ok { color:var(--pass); } .pill.no { color:var(--fail); }
+  .issues { margin:10px 0 0; padding-left:20px; } .issues li { color:var(--fail); }
+  details { margin-top:14px; } summary { cursor:pointer; font-weight:600; color:var(--brand); }
+  pre { white-space:pre-wrap; background:#0e1726; color:#d7e2f5; padding:14px; border-radius:10px; font-size:14px; }
+  .err { color:var(--fail); font-weight:600; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TTB Alcohol Label Verification</h1>
+  <p>Upload a label image and the application details. The tool checks them and shows you what matches.</p>
+</header>
+<main>
+  <div class="tabs" role="tablist">
+    <div class="tab" id="tab-single" role="tab" aria-selected="true" tabindex="0" onclick="showTab('single')">Check one label</div>
+    <div class="tab" id="tab-batch" role="tab" aria-selected="false" tabindex="0" onclick="showTab('batch')">Check many at once</div>
+  </div>
+
+  <!-- ---------- SINGLE ---------- -->
+  <section id="panel-single">
+    <div class="card">
+      <label class="fld" for="single-file">1. Label image</label>
+      <div class="drop" id="single-drop" tabindex="0" onclick="document.getElementById('single-file').click()">
+        <strong>Click to choose a label image</strong><div class="hint">or drag a photo here · JPG or PNG</div>
+      </div>
+      <input id="single-file" type="file" accept="image/*" class="hidden" onchange="onPick(this,'single-prev','single-drop')" />
+      <img id="single-prev" class="preview" alt="Selected label preview" />
+
+      <label class="fld" style="margin-top:20px;">2. Application details (fill in what you have)</label>
+      <div class="grid">
+        <div><label class="fld" for="brand_name">Brand name</label><input type="text" id="brand_name" placeholder="OLD TOM DISTILLERY" /></div>
+        <div><label class="fld" for="class_type">Class / type</label><input type="text" id="class_type" placeholder="Kentucky Straight Bourbon Whiskey" /></div>
+        <div><label class="fld" for="alcohol_content">Alcohol content</label><input type="text" id="alcohol_content" placeholder="45%" /></div>
+        <div><label class="fld" for="net_contents">Net contents</label><input type="text" id="net_contents" placeholder="750 mL" /></div>
+        <div><label class="fld" for="producer">Bottler / producer</label><input type="text" id="producer" placeholder="Name & address" /></div>
+        <div><label class="fld" for="country_of_origin">Country of origin</label><input type="text" id="country_of_origin" placeholder="(imports only)" /></div>
+      </div>
+      <button class="btn" id="single-btn" onclick="verifySingle()">Verify label</button>
+      <div class="hint">The Government Health Warning is always checked — it is required on every label.</div>
+    </div>
+    <div id="single-result"></div>
+  </section>
+
+  <!-- ---------- BATCH ---------- -->
+  <section id="panel-batch" class="hidden">
+    <div class="card">
+      <label class="fld" for="batch-files">1. Label images (select many)</label>
+      <div class="drop" id="batch-drop" tabindex="0" onclick="document.getElementById('batch-files').click()">
+        <strong>Click to choose label images</strong><div class="hint" id="batch-count">Built for peak-season uploads of 200–300 at once</div>
+      </div>
+      <input id="batch-files" type="file" accept="image/*" multiple class="hidden" onchange="onBatchPick(this)" />
+
+      <label class="fld" for="batch-csv" style="margin-top:18px;">2. Application data (optional CSV)</label>
+      <input id="batch-csv" type="file" accept=".csv" />
+      <div class="hint">Columns: <code>filename, brand_name, class_type, alcohol_content, net_contents, producer, country_of_origin</code>.
+        Without a CSV, every label still gets the required Government Warning check.</div>
+
+      <button class="btn" id="batch-btn" onclick="verifyBatch()">Verify all labels</button>
+    </div>
+    <div id="batch-result"></div>
+  </section>
+</main>
+
+<script>
+const FIELD_LABELS = { brand_name:"Brand name", class_type:"Class / type",
+  alcohol_content:"Alcohol content", net_contents:"Net contents",
+  producer:"Bottler / producer", country_of_origin:"Country of origin" };
+const KEYS = Object.keys(FIELD_LABELS);
+
+function showTab(which){
+  document.getElementById('panel-single').classList.toggle('hidden', which!=='single');
+  document.getElementById('panel-batch').classList.toggle('hidden', which!=='batch');
+  document.getElementById('tab-single').setAttribute('aria-selected', which==='single');
+  document.getElementById('tab-batch').setAttribute('aria-selected', which==='batch');
+}
+function onPick(input, prevId, dropId){
+  const f = input.files[0]; if(!f) return;
+  const img = document.getElementById(prevId);
+  img.src = URL.createObjectURL(f); img.style.display='block';
+  document.getElementById(dropId).querySelector('strong').textContent = f.name;
+}
+function onBatchPick(input){
+  const n = input.files.length;
+  document.getElementById('batch-count').textContent = n ? (n+" file(s) selected") : "Built for peak-season uploads";
+}
+function fields(){ const o={}; KEYS.forEach(k=>o[k]=document.getElementById(k).value); return o; }
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+async function verifySingle(){
+  const file = document.getElementById('single-file').files[0];
+  const out = document.getElementById('single-result');
+  if(!file){ out.innerHTML = '<div class="card err">Please choose a label image first.</div>'; return; }
+  const btn = document.getElementById('single-btn'); btn.disabled=true; btn.textContent='Checking…';
+  const fd = new FormData(); fd.append('file', file);
+  const f = fields(); KEYS.forEach(k=>fd.append(k, f[k]||''));
+  try{
+    const r = await fetch('/api/verify', {method:'POST', body:fd});
+    if(!r.ok){ throw new Error((await r.json()).detail || r.statusText); }
+    out.innerHTML = renderResult(await r.json());
+  }catch(e){ out.innerHTML = '<div class="card err">Error: '+esc(e.message)+'</div>'; }
+  finally{ btn.disabled=false; btn.textContent='Verify label'; }
+}
+
+function renderResult(res){
+  const pass = res.overall_pass;
+  let h = '<div class="card">';
+  h += '<div class="banner '+(pass?'pass':'fail')+'"><span class="mark">'+(pass?'✓':'✕')+'</span>'+
+       (pass?'Label matches the application':'Issues found — review below')+
+       '<span class="time">'+(res.elapsed_ms||0)+' ms</span></div>';
+  if(res.fields && res.fields.length){
+    h += '<table><thead><tr><th>Field</th><th>Application</th><th>On label</th><th>Result</th></tr></thead><tbody>';
+    res.fields.forEach(fr=>{
+      h += '<tr><td>'+esc(FIELD_LABELS[fr.field]||fr.field)+'</td><td>'+esc(fr.expected)+'</td>'+
+           '<td>'+esc(fr.found||'—')+'</td><td class="pill '+(fr.passed?'ok':'no')+'">'+
+           (fr.passed?'✓ match':'✕ '+esc(fr.note))+'</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+  const w = res.warning||{};
+  h += '<table><tbody><tr><td><strong>Government Warning</strong><div class="hint">required on every label</div></td>'+
+       '<td class="pill '+(w.passed?'ok':'no')+'">'+(w.passed?'✓ valid':'✕ problem')+
+       ' <span class="hint">('+(w.score||0)+'% wording match)</span></td></tr></tbody></table>';
+  if(w.issues && w.issues.length){ h += '<ul class="issues">'+w.issues.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul>'; }
+  if(res.ocr_text){ h += '<details><summary>Show text the tool read from the label</summary><pre>'+esc(res.ocr_text)+'</pre></details>'; }
+  h += '</div>';
+  return h;
+}
+
+async function verifyBatch(){
+  const files = document.getElementById('batch-files').files;
+  const out = document.getElementById('batch-result');
+  if(!files.length){ out.innerHTML = '<div class="card err">Please choose at least one label image.</div>'; return; }
+  const btn = document.getElementById('batch-btn'); btn.disabled=true; btn.textContent='Checking…';
+  const fd = new FormData();
+  for(const f of files) fd.append('files', f);
+  const csv = document.getElementById('batch-csv').files[0]; if(csv) fd.append('mapping_csv', csv);
+  const f = fields(); KEYS.forEach(k=>fd.append(k, f[k]||''));
+  try{
+    const r = await fetch('/api/verify-batch', {method:'POST', body:fd});
+    if(!r.ok){ throw new Error((await r.json()).detail || r.statusText); }
+    out.innerHTML = renderBatch(await r.json());
+  }catch(e){ out.innerHTML = '<div class="card err">Error: '+esc(e.message)+'</div>'; }
+  finally{ btn.disabled=false; btn.textContent='Verify all labels'; }
+}
+
+function renderBatch(data){
+  const s = data.summary||{};
+  let h = '<div class="card"><div class="banner '+(s.failed?'fail':'pass')+'">'+
+    '<span class="mark">'+(s.failed?'!':'✓')+'</span>'+s.passed+' passed · '+s.failed+' need review'+
+    '<span class="time">'+s.total+' labels</span></div>';
+  h += '<table><thead><tr><th>File</th><th>Result</th><th>Warning</th><th>Failed checks</th><th>Time</th></tr></thead><tbody>';
+  (data.results||[]).forEach(r=>{
+    const fails = (r.fields||[]).filter(x=>!x.passed).map(x=>FIELD_LABELS[x.field]||x.field);
+    const w = r.warning||{};
+    if(!w.passed) fails.unshift('Government Warning');
+    h += '<tr><td>'+esc(r.filename)+'</td>'+
+         '<td class="pill '+(r.overall_pass?'ok':'no')+'">'+(r.overall_pass?'✓ pass':'✕ review')+'</td>'+
+         '<td class="pill '+(w.passed?'ok':'no')+'">'+(w.passed?'✓':'✕')+'</td>'+
+         '<td>'+(r.error?('<span class="err">'+esc(r.error)+'</span>'):esc(fails.join(', ')||'—'))+'</td>'+
+         '<td>'+(r.elapsed_ms||0)+' ms</td></tr>';
+  });
+  h += '</tbody></table></div>';
+  return h;
+}
+
+// drag-and-drop support
+['single','batch'].forEach(id=>{
+  const drop = document.getElementById(id+'-drop');
+  const input = document.getElementById(id==='single'?'single-file':'batch-files');
+  drop.addEventListener('dragover', e=>{e.preventDefault(); drop.style.background='#eef2ff';});
+  drop.addEventListener('dragleave', ()=>{drop.style.background='';});
+  drop.addEventListener('drop', e=>{ e.preventDefault(); drop.style.background='';
+    input.files = e.dataTransfer.files;
+    input.dispatchEvent(new Event('change')); });
+});
+</script>
+</body>
+</html>
