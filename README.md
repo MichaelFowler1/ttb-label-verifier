@@ -6,6 +6,10 @@ Warning is present and correctly formatted. Upload a label, enter the applicatio
 details, get an instant per-field verdict. Supports single labels and bulk
 (peak-season) batches.
 
+![TTB label verification: per-field verdict and strict Government Warning check](docs/hero.png)
+
+*Real output — local Tesseract OCR on the bundled sample labels: the compliant label passes all fields, while the three Government-Warning evasions (title-case, reworded, missing) are each caught. Regenerate with `python make_hero.py`.*
+
 > Built as a take-home prototype. Standalone proof-of-concept — no COLA integration.
 
 ---
