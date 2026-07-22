@@ -1,6 +1,6 @@
-fastapi>=0.110
-uvicorn[standard]>=0.27
-pytesseract>=0.3.10
-pillow>=10.0
-rapidfuzz>=3.6
-python-multipart>=0.0.9
+fastapi==0.128.8
+uvicorn[standard]==0.39.0
+pytesseract==0.3.13
+pillow==11.3.0
+rapidfuzz==3.13.0
+python-multipart==0.0.20
