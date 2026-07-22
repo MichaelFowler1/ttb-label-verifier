@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "ttb-label-verifier"
+abstract: "AI-powered prototype for TTB alcohol label verification: OCR reads a label image, fuzzy-matches brand, ABV, and net contents against the application, and strictly validates the mandatory Government Health Warning. FastAPI + local Tesseract; single and batch modes."
+authors:
+  - family-names: "Fowler"
+    given-names: "Michael"
+    alias: "MichaelFowler1"
+repository-code: "https://github.com/MichaelFowler1/ttb-label-verifier"
+url: "https://github.com/MichaelFowler1/ttb-label-verifier"
+license: "Apache-2.0"
+date-released: "2026-06-06"
