@@ -1,0 +1,25 @@
+ttb-label-verifier
+Copyright 2026 Michael Fowler
+https://github.com/MichaelFowler1/ttb-label-verifier
+
+Required Notice: Copyright 2026 Michael Fowler (https://github.com/MichaelFowler1/ttb-label-verifier)
+
+This software is licensed under the PolyForm Noncommercial License 1.0.0 (see
+LICENSE, or https://polyformproject.org/licenses/noncommercial/1.0.0). Anyone
+who passes on a copy of any part of it has to pass on those terms, or their URL,
+and the Required Notice line above along with it.
+
+Any noncommercial purpose is free, and so is use by a charitable organization,
+educational institution, public research organization, public safety or health
+organization, environmental protection organization or government institution,
+whatever its funding. Commercial use needs a separate license from the author:
+ask through https://github.com/MichaelFowler1/ttb-label-verifier/issues.
+
+Third-party material in this repository keeps its own terms, which this
+license does not replace:
+
+- The Government Health Warning wording in app/matching.py, samples/generate_samples.py and the samples/*.png label images is the statutory text of 27 CFR 16.21, a US federal regulation, and is in the public domain.
+
+Earlier versions: every commit published before this license change was
+released under the Apache License 2.0 and stays under it. The PolyForm
+Noncommercial terms cover everything after it.

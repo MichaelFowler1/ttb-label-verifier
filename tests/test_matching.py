@@ -1,3 +1,6 @@
+# Copyright 2026 Michael Fowler
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
 """
 Unit tests for the matching/warning logic — the part most worth pinning down,
 since it encodes the brief's subtle rules. Run:  pytest -q

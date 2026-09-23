@@ -147,3 +147,16 @@ correctly failed. All well under the 5-second target.
   standalone prototype.
 - **No persistence / auth.** A production deployment needs PII handling, retention
   policy, and access control (out of scope here per Marcus).
+
+## License
+
+Everything in this repository from this change on is under the
+[PolyForm Noncommercial License 1.0.0](LICENSE), apart from the third-party
+material listed in [NOTICE](NOTICE), which keeps its own terms. Earlier commits were released
+under the Apache License 2.0 and stay under it. In plain terms: it is free for
+any noncommercial purpose, and for schools and universities, public research
+organizations, government institutions and charities, whatever their funding.
+Commercial use needs a license from the author: ask through
+[the issue tracker](https://github.com/MichaelFowler1/ttb-label-verifier/issues). Anyone who
+passes on a copy has to pass on the license and the `Required Notice:` line in
+[NOTICE](NOTICE). This is a plain summary; the LICENSE file is what governs.
